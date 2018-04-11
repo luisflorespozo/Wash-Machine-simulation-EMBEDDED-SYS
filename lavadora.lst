@@ -1,0 +1,641 @@
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+Warning[205]: Found directive in column 1. (__CONFIG)
+2007   3FF1           00001 __CONFIG _CP_OFF& _WDT_OFF& _PWRTE_ON& _XT_OSC
+Warning[205]: Found directive in column 1. (LIST)
+                      00002 LIST P = 16F84
+Warning[205]: Found directive in column 1. (INCLUDE)
+                      00003 INCLUDE <P16F84.INC>
+                      00001         LIST
+                      00002 ; P16F84.INC  Standard Header File, Version 2.00    Microchip Technology, Inc.
+                      00136         LIST
+                      00004 
+  00000003            00005 ESTATUS EQU     03H
+  00000005            00006 PORTA   EQU     05H
+  00000006            00007 PORTB   EQU     06H
+  00000085            00008 TRISA   EQU     85H
+  00000086            00009 TRISB   EQU     86H
+  0000000C            00010 CONTSEL EQU 0CH
+  0000000D            00011 CONTEMP EQU 0DH
+  0000001C            00012 AUXSEL  EQU 1CH
+  0000002C            00013 AUXTEM  EQU 2CH
+  0000001D            00014 PDel0   EQU 1DH
+  0000002D            00015 PDel1   EQU 2DH
+  0000003C            00016 CONTROL EQU     3CH
+  0000003D            00017 CONTROL2        EQU     3DH
+  0000004D            00018 PAUSALLENADO    EQU     4DH
+                      00019 
+0000                  00020                 ORG     00H
+0000   1683           00021                 BSF     ESTATUS,5;      Para ir al banco 1
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0001   0185           00022                 CLRF    TRISA;          
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0002   1585           00023                 BSF             TRISA,3;        Para el sw1 del proceso
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0003   1605           00024                 BSF             TRISA,4;        Para el sw2 de la temperatura
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0004   0186           00025                 CLRF    TRISB;          Para poner todas las patitas en 0
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0005   1186           00026                 BCF             TRISB,3
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0006   1786           00027                 BSF             TRISB,7;        Para el sw3 del start/pause
+0007   1283           00028                 BCF             ESTATUS,5;      Para volver al banco 0
+                      00029 
+0008   0185           00030 INICIO  CLRF    PORTA           ; DP=0
+0009   0186           00031                 CLRF    PORTB           ; MT-=MT+=LA=LV=LR=B=OFF
+000A   1606           00032                 BSF             PORTB,4;        Prendemos led rojo
+000B   018C           00033                 CLRF    CONTSEL         ; CONTSEL=0 Selec proceso
+000C   018D           00034                 CLRF    CONTEMP         ; CONTEMP=0 Selec temperatura
+000D   01BC           00035                 CLRF    CONTROL;        BORRAMOS LAS VAR AUX DE CONTROL
+000E   01BD           00036                 CLRF    CONTROL2
+000F   01CD           00037                 CLRF    PAUSALLENADO
+0010   203D           00038 SELECT  CALL    START
+0011   1985           00039                 BTFSC   PORTA,3         ; SEL=0?
+0012   281B           00040                 GOTO    TEMPER
+0013   210E           00041                 CALL    DELAY
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0014   0A8C           00042                 INCF    CONTSEL,1                       ;CONTSEL=CONTSEL+1 Y SE GUARDA EN CONTSEL
+0015   3005           00043                 MOVLW   0X05                    ;CARGANDO W<=5
+0016   020C           00044                 SUBWF   CONTSEL,W;              HACEMOS CONTSEL-W Y SI ES CERO SE GUARDA EN ESTATUS,2
+0017   1D03           00045                 BTFSS   ESTATUS,2;              VERIFICAMOS SI ES CERO
+0018   282D           00046                 GOTO    MOSTRAR;                SI NO ES CERO VA A MOSTRAR EN EL DISPLAY
+0019   2825           00047                 GOTO    CHECK
+001A   281B           00048                 GOTO    TEMPER
+                      00049 
+001B   203D           00050 TEMPER  CALL    START;  PREGUNTAMOS SI SE PRECIONO START
+001C   1A05           00051 AA              BTFSC   PORTA,4;        SW2 TEMPER=0?
+001D   2810           00052                 GOTO    SELECT; SI NO APRETA VUELVE A PREGUNTAR EN SW1 SELECT
+001E   210E           00053                 CALL    DELAY;                  SI SI, HACE EL CONTEO HASTA 70GRADOS
+001F   0A8D           00054                 INCF    CONTEMP,1                       ;CONTSEL=CONTSEL+1 Y SE GUARDA EN CONTSEL
+0020   3010           00055                 MOVLW   0X10                    ;CARGANDO W<=10
+0021   020D           00056                 SUBWF   CONTEMP,W
+0022   1D03           00057                 BTFSS   ESTATUS,2
+0023   2833           00058                 GOTO    MOSTRAR2
+0024   2810           00059                 GOTO    SELECT
+0025                  00060 CHECK
+0025   1103           00061                 BCF             ESTATUS,2;      CONTROLAMOS QUE CONTSEL NO INCREMENTE MAS QUE 4
+0026   3005           00062                 MOVLW   0X05
+0027   020C           00063                 SUBWF   CONTSEL,W;      COMPARA 
+0028   1D03           00064                 BTFSS   ESTATUS,2;      CONTEMP=4? 
+0029   281B           00065                 GOTO    TEMPER; si no es 1 va al control de temperatura
+002A   018C           00066                 CLRF    CONTSEL
+002B   0185           00067                 CLRF    PORTA
+002C   281B           00068                 GOTO    TEMPER
+                      00069                 
+002D   080C           00070 MOSTRAR MOVF    CONTSEL,0
+002E   0085           00071                 MOVWF   PORTA;  MOSTRAMOS EL VALOR DE CONTSEL EN EL DISPLAY
+002F   1103           00072                 BCF             ESTATUS,2
+0030   1206           00073                 BCF             PORTB,4; APAGAMOS EL LED ROJO DE READY
+0031   1706           00074                 BSF             PORTB,6;        PRENDEMOS EL LED VERDE DE TEMPERATURA
+0032   2810           00075                 GOTO    SELECT
+                      00076 
+0033                  00077 MOSTRAR2
+0033   080D           00078                 MOVF    CONTEMP,0
+0034   0085           00079                 MOVWF   PORTA;          MUESTRA EL VALOR DE LA TEMPERATURA EN EL DISPLAY
+0035   1103           00080                 BCF             ESTATUS,2;      NOS ASEGURAMOS Q ESTE EN 0
+0036   1206           00081                 BCF             PORTB,4 ;       APAGAMOS LED ROJO
+0037   1706           00082                 BSF             PORTB,6;        PRENDEMOS LED VERDE DE TEMP
+0038   281C           00083                 GOTO    AA;                     VAMOS A LA SUBETIQUETA DE TEMPERATURA
+0039   01AC           00084                 CLRF    AUXTEM;         LIMPIAMOS EL AUXILIAR DE TEMPERATURA
+003A   080C           00085                 MOVF    CONTSEL,0
+003B   009C           00086                 MOVWF   AUXSEL
+Warning[202]: Argument out of range.  Least significant bits used.
+003C   080D           00087                 MOVF    CONTEMP,AUXTEM; HACEMOS AUXTEM<-CONTEMP
+003D                  00088 START
+003D   1B86           00089                 BTFSC   PORTB,7;        PREGUNTAMOS SI SE APRETO START
+003E   0008           00090                 RETURN;                         SI ES FALSO RETORNA
+003F   2840           00091                 GOTO    PROCESO;        SI ES VERDADERO EMPIEZA EL PROCESO PEDIDO
+0040                  00092 PROCESO
+0040                  00093 CASO0
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0040   1103           00094                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+0041   3000           00095                 MOVLW   0X00;           CARGA 1 A W
+0042   020C           00096                 SUBWF   CONTSEL,W;      COMPARA 
+0043   1D03           00097                 BTFSS   ESTATUS,2;      CONTSEL=1? 
+0044   2846           00098                 GOTO    CASO1;  SI NO ES VERDADERO VA A PREGUNTAR CASO2
+0045   283D           00099                 GOTO    START;  SI ES VERDADERO VA AL PRELAVADO 
+0046                  00100 CASO1
+0046   1103           00101                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+0047   3001           00102                 MOVLW   0X01;           CARGA 1 A W
+0048   020C           00103                 SUBWF   CONTSEL,W;      COMPARA 
+0049   1D03           00104                 BTFSS   ESTATUS,2;      CONTSEL=1? 
+004A   284C           00105                 GOTO    CASO2;  SI NO ES VERDADERO VA A PREGUNTAR CASO2
+004B   2863           00106                 GOTO    PRELAVADO;      SI ES VERDADERO VA AL PRELAVADO
+004C                  00107 CASO2   
+004C   1103           00108                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+004D   3002           00109                 MOVLW   0X02;           CARGA 2 A W
+004E   020C           00110                 SUBWF   CONTSEL,W;      COMPARA 
+004F   1D03           00111                 BTFSS   ESTATUS,2;      CONTSEL=2? 
+0050   2854           00112                 GOTO    CASO3;  SI NO ES VERDADERO VA A PREGUNTAR CASO3
+0051   038C           00113                 DECF    CONTSEL,1
+0052   0A8D           00114                 INCF    CONTEMP,1
+0053   289F           00115                 GOTO    LAVADO; SI ES VERDADERO VA AL LAVADO
+0054                  00116 CASO3
+0054   1103           00117                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+0055   3003           00118                 MOVLW   0X03;           CARGA 3 A W
+0056   020C           00119                 SUBWF   CONTSEL,W;      COMPARA 
+0057   1D03           00120                 BTFSS   ESTATUS,2;      CONTSEL=3?  
+0058   285B           00121                 GOTO    CASO4;  SI NO ES VERDADERO VA A PREGUNTAR CASO4
+0059   0186           00122                 CLRF    PORTB
+005A   28B0           00123                 GOTO    ENJUAGADO;      SI ES VERDADERO VA AL ENJUAGADO
+005B                  00124 CASO4
+005B   03BC           00125                 DECF    CONTROL,1
+005C   1103           00126                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+005D   3004           00127                 MOVLW   0X04;           CARGA 4 A W
+005E   020C           00128                 SUBWF   CONTSEL,W;      COMPARA 
+005F   1D03           00129                 BTFSS   ESTATUS,2;      CONTSEL=4? 
+0060   2840           00130                 GOTO    CASO0;  SI NO ES VERDADERO VA A PREGUNTAR CASO1
+0061   0186           00131                 CLRF    PORTB
+0062   28D7           00132                 GOTO    SECADO; SI ES VERDADERO VA AL SECADO
+0063                  00133 PRELAVADO
+0063   1103           00134                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE EN 0
+0064   080C           00135                 MOVF    CONTSEL,W
+0065   0085           00136                 MOVWF   PORTA;          MOVEMOS EL VALOR DE LA SELECCION AL DISPLAY
+0066   0186           00137                 CLRF    PORTB
+0067   1686           00138                 BSF             PORTB,5;        PRENDEMOS EL LED DE LLENADO DE AGUA
+0068   1706           00139                 BSF             PORTB,6;        PRENDEMOS EL LED VERDE DE TEMPERATURA
+0069   2112           00140                 CALL    DELAYLLENADO
+006A   2112           00141                 CALL    DELAYLLENADO
+006B   1286           00142                 BCF             PORTB,5;        APAGAMOS LED DE LLENADO
+006C   1306           00143                 BCF             PORTB,6;        APAGAMOS LED DE TEMPERATURA
+006D   0A8D           00144                 INCF    CONTEMP,1;      INCREMENTAMOS CONTEMP+1 PARA SEGUIR AL SIGUIENTE PASO
+006E   0185           00145                 CLRF    PORTA
+006F   210E           00146                 CALL    DELAY
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  4
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0070   210E           00147                 CALL    DELAY
+0071                  00148 CONTEO
+0071   0AAC           00149                 INCF    AUXTEM,1; INCREMENTAMOS EL VALOR DE TEMP
+0072   080D           00150                 MOVF    CONTEMP,0
+0073   022C           00151                 SUBWF   AUXTEM,W;       COMPARAMOS AUXTEM CON W( SI AUXTEM<CONTEMP
+0074   1D03           00152                 BTFSS   ESTATUS,2
+0075   2877           00153                 GOTO    AUMENTARTEMP; SI NO ES VERDAD, VAMOS A AUXTEM+1 Y MOSTRAMOS EN EL DISPLAY EL INC
+                            REMENTO
+0076   287F           00154                 GOTO    MOTOR;          SI ES VERDAD NO AUMENTA MAS LA TEMPERATURA Y VA A MOVER EL MOTOR
+                      00155                 
+0077                  00156 AUMENTARTEMP
+0077   1706           00157                 BSF             PORTB,6 ;       PRENDEMOS EL LED DE TEMPERATURA
+0078   082C           00158                 MOVF    AUXTEM,0;        HACEMOS W<-AUXTEM
+0079   0085           00159                 MOVWF   PORTA
+007A   2102           00160                 CALL    DELAY2
+007B   210E           00161                 CALL    DELAY
+007C   1103           00162                 BCF             ESTATUS,2;      NOS ASEGURAMOS QUE ESTE 0
+007D   2871           00163                 GOTO    CONTEO  ;       VAMOS A CONTEO (CICLO)
+Warning[203]: Found opcode in column 1. (RETURN)
+007E   0008           00164 RETURN
+007F                  00165 MOTOR
+007F   080C           00166                 MOVF    CONTSEL,W
+0080   0085           00167                 MOVWF   PORTA;  MOSTRAMOS EN EL DISPLAY EL VALOR DE CONTSEL
+0081   0186           00168                 CLRF    PORTB
+0082   1506           00169                 BSF             PORTB,2;        MOTOR GIRA EN UN SENTIDO
+0083   20E5           00170                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0084   2157           00171                 CALL    DELAYMOTOR
+0085   20E5           00172                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0086   1106           00173                 BCF             PORTB,2
+0087   1486           00174                 BSF             PORTB,1;        MOTOR GIRA EN OTRO SENTIDO
+0088   20E5           00175                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0089   2157           00176                 CALL    DELAYMOTOR
+008A   20E5           00177                 CALL    ESPAUSA;        pregunta si se apreto STOP
+008B   1086           00178                 BCF             PORTB,1
+008C   1506           00179                 BSF             PORTB,2
+008D   20E5           00180                 CALL    ESPAUSA;        pregunta si se apreto STOP
+008E   2157           00181                 CALL    DELAYMOTOR
+008F   20E5           00182                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0090   1586           00183                 BSF             PORTB,3
+0091   1106           00184                 BCF             PORTB,2
+0092   1486           00185                 BSF             PORTB,1 
+0093   20E5           00186                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0094   2157           00187                 CALL    DELAYMOTOR
+0095   20E5           00188                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0096   1086           00189                 BCF             PORTB,1
+0097   1506           00190                 BSF             PORTB,2 
+0098   20E5           00191                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0099   2157           00192                 CALL    DELAYMOTOR
+009A   1106           00193                 BCF             PORTB,2
+009B   2157           00194                 CALL    DELAYMOTOR
+009C   2112           00195                 CALL    DELAYLLENADO
+009D   20E5           00196                 CALL    ESPAUSA;        pregunta si se apreto STOP
+009E   0186           00197                 CLRF    PORTB
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  5
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00198 
+009F   0A8C           00199 LAVADO  INCF    CONTSEL,1;      INCREMENTAMOS CONTSEL EN 1
+00A0   0ABC           00200                 INCF    CONTROL,1;      INCREMENTAMOS LA VARIABLE CONTROL EN 1
+00A1   01AC           00201                 CLRF    AUXTEM;         LIMPIAMOS LA VARIABLE AUXTEM
+00A2   080C           00202                 MOVF    CONTSEL,0
+00A3   0085           00203                 MOVWF   PORTA;  MOSTRAMOS EL VALOR DE CONTSEL EN EL DISPLAY
+00A4   1686           00204                 BSF             PORTB,5;        PRENDEMOS EL LED DE LLENADO DE AGUA
+00A5   2112           00205                 CALL    DELAYLLENADO
+00A6   2112           00206                 CALL    DELAYLLENADO
+00A7   1286           00207                 BCF             PORTB,5
+00A8   210E           00208                 CALL    DELAY;   APAGAMOS EL LED DE LLENADO DE AGUA
+00A9   1103           00209                 BCF             ESTATUS,2;       NOS ASEGURAMOS QUE ESTE EN 0
+00AA   3002           00210                 MOVLW   0X02;           HACEMOS W=2
+00AB   023C           00211                 SUBWF   CONTROL,W;      COMPARAMOS CONTROL=2?
+00AC   1D03           00212                 BTFSS   ESTATUS,2
+00AD   2871           00213                 GOTO    CONTEO; SI ES FALSO VAMOS A CONTEO
+00AE   0186           00214                 CLRF    PORTB
+00AF   28B0           00215                 GOTO    ENJUAGADO;      SI ES VERDADERO PASAMOS A ENJUAGADO
+                      00216 
+                      00217         
+00B0                  00218 ENJUAGADO
+00B0   01AC           00219                 CLRF    AUXTEM; BORRAMOS LA VARIABLE AUXTEM
+00B1   080C           00220                 MOVF    CONTSEL,0
+00B2   0085           00221                 MOVWF   PORTA;  MOVEMOS EL VALOR DE CONTSEL AL DISPLAY
+00B3   1686           00222                 BSF             PORTB,5
+00B4   2112           00223                 CALL    DELAYLLENADO
+00B5   0186           00224                 CLRF    PORTB
+00B6   1506           00225                 BSF             PORTB,2;        PRENDEMOS EL MOTOR EN UN SENTIDO
+00B7   20E5           00226                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00B8   2157           00227                 CALL    DELAYMOTOR
+00B9   20E5           00228                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00BA   1106           00229                 BCF             PORTB,2
+00BB   1486           00230                 BSF             PORTB,1;        MOTOR GIRA EN OTRO SENTIDO
+00BC   20E5           00231                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00BD   2157           00232                 CALL    DELAYMOTOR
+00BE   20E5           00233                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00BF   1086           00234                 BCF             PORTB,1
+00C0   1506           00235                 BSF             PORTB,2
+00C1   20E5           00236                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00C2   2157           00237                 CALL    DELAYMOTOR
+00C3   20E5           00238                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00C4   1586           00239                 BSF             PORTB,3;        PRENDEMOS LED DE VACIADO DE AGUA
+00C5   1106           00240                 BCF             PORTB,2
+00C6   1486           00241                 BSF             PORTB,1 
+00C7   20E5           00242                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00C8   2157           00243                 CALL    DELAYMOTOR
+00C9   20E5           00244                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00CA   1086           00245                 BCF             PORTB,1
+00CB   1506           00246                 BSF             PORTB,2 
+00CC   20E5           00247                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00CD   2157           00248                 CALL    DELAYMOTOR
+00CE   1106           00249                 BCF             PORTB,2
+00CF   2157           00250                 CALL    DELAYMOTOR
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00D0   2112           00251                 CALL    DELAYLLENADO
+00D1   20E5           00252                 CALL    ESPAUSA;        pregunta si se apreto STOP
+00D2   0186           00253                 CLRF    PORTB
+                      00254 
+00D3   0A8C           00255                 INCF    CONTSEL,1;       HACEMOS CONTSEL+1
+00D4   080C           00256                 MOVF    CONTSEL,0
+00D5   0085           00257                 MOVWF   PORTA;  MOSTRAMOS EN EL DISPLAY EL CONTSEL Y PASAMOS AL SECADO
+00D6   210E           00258                 CALL    DELAY
+00D7                  00259 SECADO          
+00D7   080C           00260                 MOVF    CONTSEL,0
+00D8   0085           00261                 MOVWF   PORTA;  MOSTRAMOS EL VALOR DE CONTSEL EN EL DISPLAY
+00D9   1586           00262                 BSF             PORTB,3;         PRENDEMOS LED DE VACIADO DE AGUA
+00DA   1506           00263                 BSF             PORTB,2;         PRENDEMOS MOTOR EN UN SENTIDO
+00DB   2157           00264                 CALL    DELAYMOTOR
+00DC   2157           00265                 CALL    DELAYMOTOR
+00DD   1106           00266                 BCF             PORTB,2;        APAGAMOS MOTOR
+00DE                  00267 FINAL
+00DE   0185           00268                 CLRF    PORTA   
+00DF   1186           00269                 BCF             PORTB,3;        APAGAMOS VACIADO DE AGUA
+00E0   210E           00270                 CALL    DELAY
+00E1   1406           00271                 BSF             PORTB,0;        PRENDEMOS LA BOCINA
+00E2   1606           00272                 BSF             PORTB,4;        PRENDEMOSEL LED ROJO DE READY
+00E3   210E           00273                 CALL    DELAY
+00E4   2808           00274                 GOTO    INICIO;         VOLVEMOS AL INICIO PARA HACER OTRA OPERACION
+                      00275                 
+00E5                  00276 ESPAUSA 
+00E5   1B86           00277                 BTFSC   PORTB,7;                        pregunta por primera vez sw3=0?
+00E6   0008           00278                 RETURN;                                         si no se sale continua en lo que estaba
+00E7   080C           00279                 MOVF    CONTSEL,0;                              cargamos el valor de contsel en w
+00E8   0085           00280                 MOVWF   PORTA;                          mostramos el valor de selec en el disp
+00E9   0186           00281                 CLRF    PORTB
+00EA                  00282 VUELTA  
+00EA   1606           00283                                 BSF             PORTB,4;         prende el led rojo
+00EB   1406           00284                                 BSF             PORTB,0;        prende la bocina
+00EC   2102           00285                                 CALL    DELAY2
+00ED   1206           00286                                 BCF     PORTB,4;        apaga el led rojo
+00EE   1006           00287                                 BCF             PORTB,0;        apaga la bocina
+00EF   2102           00288                                 CALL    DELAY2
+00F0   1B86           00289                                 BTFSC   PORTB,7;         vuelve a preguntar si sw4=0?
+00F1   28EA           00290                                 GOTO    VUELTA;     si no se volvio a apretar se queda parpadeando
+00F2   0008           00291                 RETURN; 
+00F3                  00292 ESPAUSALLENADO  
+                      00293                 ;               CLRF    PAUSALLENADO
+                      00294         ;                       BCF             ESTATUS,2
+00F3   1B86           00295                 BTFSC   PORTB,7;                        pregunta por primera vez sw3=0?
+00F4   0008           00296                 RETURN;                                         si no se sale continua en lo que estaba
+00F5   080C           00297                 MOVF    CONTSEL,0;                              cargamos el valor de contsel en w
+00F6   0085           00298                 MOVWF   PORTA;                          mostramos el valor de selec en el disp
+00F7   0186           00299                 CLRF    PORTB
+00F8                  00300 VUELTA2 
+00F8   1606           00301                                 BSF             PORTB,4;         prende el led rojo
+00F9   1406           00302                                 BSF             PORTB,0;        prende la bocina
+00FA   2102           00303                                 CALL    DELAY2
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00FB   1206           00304                                 BCF     PORTB,4;        apaga el led rojo
+00FC   1006           00305                                 BCF             PORTB,0;        apaga la bocina
+00FD   2102           00306                                 CALL    DELAY2
+00FE   1B86           00307                                 BTFSC   PORTB,7;         vuelve a preguntar si sw4=0?
+00FF   28F8           00308                                 GOTO    VUELTA2;     si no se volvio a apretar se queda parpadeando
+0100   0ACD           00309                                 INCF    PAUSALLENADO,1
+0101   0008           00310                 RETURN; 
+                      00311 
+                      00312 
+                      00313 
+0102   30FD           00314 DELAY2  movlw     .253 ; 1 set numero de repeticion  (B)
+0103   009D           00315        movwf     PDel0 ; 1
+0104   30FD           00316 PLoop1  movlw     .253 ; 1 set numero de repeticion  (A)
+0105   00AD           00317        movwf     PDel1 ; 1
+0106   0064           00318 PLoop2  clrwdt ; 1 clear watchdog
+0107   0064           00319        clrwdt ; 1 ciclo delay
+0108   0BAD           00320        decfsz    PDel1,1 ; 1 + (1) es el tiempo 0  ? (A)
+0109   2906           00321        goto      PLoop2 ; 2 no, loop
+010A   0B9D           00322        decfsz    PDel0,1 ; 1 + (1) es el tiempo 0  ? (B)
+010B   2904           00323        goto      PLoop1 ; 2 no, loop
+010C   290D           00324 PDelL1  goto PDelL2 ; 2 ciclos delay
+010D                  00325 PDelL2  
+010D   0008           00326        return ; 2+2 Fin.
+                      00327 
+010E   2102           00328 DELAY   CALL DELAY2
+010F   20E5           00329                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0110   2102           00330                 CALL DELAY2
+0111   0008           00331                 RETURN
+                      00332 
+0112                  00333 DELAYLLENADO    
+0112   210E           00334                 CALL    DELAY
+0113   210E           00335                 CALL    DELAY
+0114   210E           00336                 CALL    DELAY
+0115   20F3           00337                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0116   3001           00338                                 MOVLW   0X01;           HACEMOS W=2
+0117   024D           00339                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0118   1903           00340                                 BTFSC   ESTATUS,2
+0119   0008           00341                                 RETURN; SI ES FALSO VAMOS A CONTEO
+011A   210E           00342                 CALL    DELAY
+011B   20F3           00343                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+011C   3001           00344                                 MOVLW   0X01;           HACEMOS W=2
+011D   024D           00345                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+011E   1903           00346                                 BTFSC   ESTATUS,2
+011F   0008           00347                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0120   210E           00348                 CALL    DELAY
+0121   20F3           00349                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0122   3001           00350                                 MOVLW   0X01;           HACEMOS W=2
+0123   024D           00351                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0124   1903           00352                                 BTFSC   ESTATUS,2
+0125   0008           00353                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0126   210E           00354                 CALL    DELAY
+0127   20F3           00355                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0128   3001           00356                                 MOVLW   0X01;           HACEMOS W=2
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0129   024D           00357                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+012A   1903           00358                                 BTFSC   ESTATUS,2
+012B   0008           00359                                 RETURN; SI ES FALSO VAMOS A CONTEO
+012C   210E           00360                 CALL    DELAY
+012D   20F3           00361                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+012E   3001           00362                                 MOVLW   0X01;           HACEMOS W=2
+012F   024D           00363                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0130   1903           00364                                 BTFSC   ESTATUS,2
+0131   0008           00365                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0132   210E           00366                 CALL    DELAY
+0133   20F3           00367                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0134   3001           00368                                 MOVLW   0X01;           HACEMOS W=2
+0135   024D           00369                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0136   1903           00370                                 BTFSC   ESTATUS,2
+0137   0008           00371                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0138   210E           00372                 CALL    DELAY
+0139   20F3           00373                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+013A   3001           00374                                 MOVLW   0X01;           HACEMOS W=2
+013B   024D           00375                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+013C   1903           00376                                 BTFSC   ESTATUS,2
+013D   0008           00377                                 RETURN; SI ES FALSO VAMOS A CONTEO
+013E   210E           00378                 CALL    DELAY
+013F   20F3           00379                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0140   3001           00380                                 MOVLW   0X01;           HACEMOS W=2
+0141   024D           00381                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0142   1903           00382                                 BTFSC   ESTATUS,2
+0143   0008           00383                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0144   210E           00384                 CALL    DELAY
+0145   20F3           00385                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0146   3001           00386                                 MOVLW   0X01;           HACEMOS W=2
+0147   024D           00387                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0148   1903           00388                                 BTFSC   ESTATUS,2
+0149   0008           00389                                 RETURN; SI ES FALSO VAMOS A CONTEO
+014A   210E           00390                 CALL    DELAY
+014B   20F3           00391                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+014C   3001           00392                                 MOVLW   0X01;           HACEMOS W=2
+014D   024D           00393                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+014E   1903           00394                                 BTFSC   ESTATUS,2
+014F   0008           00395                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0150   210E           00396                 CALL    DELAY
+0151   20F3           00397                 CALL    ESPAUSALLENADO;         pregunta si se apreto STOP
+0152   3001           00398                                 MOVLW   0X01;           HACEMOS W=2
+0153   024D           00399                                 SUBWF   PAUSALLENADO,W; COMPARAMOS PAUSALLENADO=1?
+0154   1903           00400                                 BTFSC   ESTATUS,2
+0155   0008           00401                                 RETURN; SI ES FALSO VAMOS A CONTEO
+0156   0008           00402                 RETURN
+0157                  00403 DELAYMOTOR
+                      00404         
+0157   210E           00405                 CALL    DELAY
+0158   210E           00406                 CALL    DELAY
+0159   20E5           00407                 CALL    ESPAUSA;        pregunta si se apreto STOP
+015A   210E           00408                 CALL    DELAY
+015B   20E5           00409                 CALL    ESPAUSA;        pregunta si se apreto STOP
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+015C   210E           00410                 CALL    DELAY
+015D   20E5           00411                 CALL    ESPAUSA;        pregunta si se apreto STOP
+015E   210E           00412                 CALL    DELAY
+015F   20E5           00413                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0160   210E           00414                 CALL    DELAY
+0161   20E5           00415                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0162   210E           00416                 CALL    DELAY
+0163   20E5           00417                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0164   210E           00418                 CALL    DELAY
+0165   20E5           00419                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0166   210E           00420                 CALL    DELAY
+0167   20E5           00421                 CALL    ESPAUSA;        pregunta si se apreto STOP
+0168   210E           00422                 CALL    DELAY
+0169   20E5           00423                 CALL    ESPAUSA;        pregunta si se apreto STOP
+016A   210E           00424                 CALL    DELAY
+016B   20E5           00425                 CALL    ESPAUSA;        pregunta si se apreto STOP
+016C   210E           00426                 CALL    DELAY
+016D   0008           00427                 RETURN
+Warning[203]: Found opcode in column 1. (RETURN)
+016E   0008           00428 RETURN
+                      00429 
+Warning[205]: Found directive in column 1. (END)
+                      00430 END
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+AA                                0000001C
+AUMENTARTEMP                      00000077
+AUXSEL                            0000001C
+AUXTEM                            0000002C
+C                                 00000000
+CASO0                             00000040
+CASO1                             00000046
+CASO2                             0000004C
+CASO3                             00000054
+CASO4                             0000005B
+CHECK                             00000025
+CONTEMP                           0000000D
+CONTEO                            00000071
+CONTROL                           0000003C
+CONTROL2                          0000003D
+CONTSEL                           0000000C
+DC                                00000001
+DELAY                             0000010E
+DELAY2                            00000102
+DELAYLLENADO                      00000112
+DELAYMOTOR                        00000157
+EEADR                             00000009
+EECON1                            00000088
+EECON2                            00000089
+EEDATA                            00000008
+EEIE                              00000006
+EEIF                              00000004
+ENJUAGADO                         000000B0
+ESPAUSA                           000000E5
+ESPAUSALLENADO                    000000F3
+ESTATUS                           00000003
+F                                 00000001
+FINAL                             000000DE
+FSR                               00000004
+GIE                               00000007
+INDF                              00000000
+INICIO                            00000008
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+LAVADO                            0000009F
+MOSTRAR                           0000002D
+MOSTRAR2                          00000033
+MOTOR                             0000007F
+NOT_PD                            00000003
+NOT_RBPU                          00000007
+NOT_TO                            00000004
+OPTION_REG                        00000081
+PAUSALLENADO                      0000004D
+PCL                               00000002
+PCLATH                            0000000A
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE 11
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+PDel0                             0000001D
+PDel1                             0000002D
+PDelL1                            0000010C
+PDelL2                            0000010D
+PLoop1                            00000104
+PLoop2                            00000106
+PORTA                             00000005
+PORTB                             00000006
+PRELAVADO                         00000063
+PROCESO                           00000040
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+RBIE                              00000003
+RBIF                              00000000
+RD                                00000000
+RP0                               00000005
+RP1                               00000006
+SECADO                            000000D7
+SELECT                            00000010
+START                             0000003D
+STATUS                            00000003
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+TEMPER                            0000001B
+TMR0                              00000001
+TRISA                             00000085
+TRISB                             00000086
+VUELTA                            000000EA
+VUELTA2                           000000F8
+W                                 00000000
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+Z                                 00000002
+_CP_OFF                           00003FFF
+_CP_ON                            0000000F
+_HS_OSC                           00003FFE
+_LP_OSC                           00003FFC
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F84                           00000001
+__DEBUG                           1
+MPASM  5.35                      LAVADORA.ASM   5-4-2011  11:14:12         PAGE 12
+
+
+MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
+
+
+0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0080 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+00C0 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0100 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
+0140 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXX- ----------------
+2000 : -------X-------- ---------------- ---------------- ----------------
+
+All other memory blocks unused.
+
+Program Memory Words Used:   367
+Program Memory Words Free:   657
+
+
+Errors   :     0
+Warnings :     7 reported,     0 suppressed
+Messages :     6 reported,     0 suppressed
+
+

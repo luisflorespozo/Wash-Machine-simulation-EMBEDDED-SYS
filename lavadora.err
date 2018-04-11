@@ -1,0 +1,13 @@
+Warning[205] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 1 : Found directive in column 1. (__CONFIG)
+Warning[205] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 2 : Found directive in column 1. (LIST)
+Warning[205] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 3 : Found directive in column 1. (INCLUDE)
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 22 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 23 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 24 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 25 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 26 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 27 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[202] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 87 : Argument out of range.  Least significant bits used.
+Warning[203] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 164 : Found opcode in column 1. (RETURN)
+Warning[203] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 428 : Found opcode in column 1. (RETURN)
+Warning[205] C:\USERS\WIN7\DESKTOP\PRUEBAS LAVADORA\LAVADORA.ASM 430 : Found directive in column 1. (END)

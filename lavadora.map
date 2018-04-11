@@ -1,0 +1,100 @@
+MPLINK 4.35, Linker
+Linker Map File - Created Wed May 04 11:14:13 2011
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000000
+                   .org_1       code   0x000000    program   0x0002de
+  .config_2007_LAVADORA.O       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x00016e      
+                            0x002007    0x002007      
+            368 out of 1093 program addresses used, program memory utilization is 33%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                       AA   0x00001c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+             AUMENTARTEMP   0x000077    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO0   0x000040    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO1   0x000046    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO2   0x00004c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO3   0x000054    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO4   0x00005b    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CHECK   0x000025    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   CONTEO   0x000071    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    DELAY   0x00010e    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   DELAY2   0x000102    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+             DELAYLLENADO   0x000112    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+               DELAYMOTOR   0x000157    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                ENJUAGADO   0x0000b0    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  ESPAUSA   0x0000e5    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+           ESPAUSALLENADO   0x0000f3    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    FINAL   0x0000de    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   INICIO   0x000008    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   LAVADO   0x00009f    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  MOSTRAR   0x00002d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                 MOSTRAR2   0x000033    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    MOTOR   0x00007f    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PDelL1   0x00010c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PDelL2   0x00010d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PLoop1   0x000104    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PLoop2   0x000106    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                PRELAVADO   0x000063    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  PROCESO   0x000040    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   SECADO   0x0000d7    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   SELECT   0x000010    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    START   0x00003d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   TEMPER   0x00001b    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   VUELTA   0x0000ea    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  VUELTA2   0x0000f8    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   INICIO   0x000008    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   SELECT   0x000010    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   TEMPER   0x00001b    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                       AA   0x00001c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CHECK   0x000025    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  MOSTRAR   0x00002d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                 MOSTRAR2   0x000033    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    START   0x00003d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  PROCESO   0x000040    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO0   0x000040    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO1   0x000046    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO2   0x00004c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO3   0x000054    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    CASO4   0x00005b    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                PRELAVADO   0x000063    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   CONTEO   0x000071    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+             AUMENTARTEMP   0x000077    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    MOTOR   0x00007f    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   LAVADO   0x00009f    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                ENJUAGADO   0x0000b0    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   SECADO   0x0000d7    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    FINAL   0x0000de    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  ESPAUSA   0x0000e5    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   VUELTA   0x0000ea    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+           ESPAUSALLENADO   0x0000f3    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                  VUELTA2   0x0000f8    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   DELAY2   0x000102    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PLoop1   0x000104    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PLoop2   0x000106    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PDelL1   0x00010c    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                   PDelL2   0x00010d    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+                    DELAY   0x00010e    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+             DELAYLLENADO   0x000112    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+               DELAYMOTOR   0x000157    program     static C:\Users\Win7\Desktop\pruebas lavadora\lavadora.asm
+
+
